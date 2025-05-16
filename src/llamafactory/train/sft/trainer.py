@@ -18,7 +18,7 @@
 import json
 import os
 from types import MethodType
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union , Callable
 
 import numpy as np
 import torch
@@ -51,6 +51,7 @@ class CustomSeq2SeqTrainer(Seq2SeqTrainer):
         finetuning_args: "FinetuningArguments",
         processor: Optional["ProcessorMixin"],
         gen_kwargs: Optional[dict[str, Any]] = None,
+        compute_loss_func: Optional[Callable] = None,
         **kwargs,
     ) -> None:
         if is_transformers_version_greater_than("4.46"):
