@@ -30,7 +30,7 @@ from ...extras.constants import IGNORE_INDEX
 from ...extras.packages import is_transformers_version_greater_than
 from ..callbacks import SaveProcessorCallback
 from ..trainer_utils import create_custom_optimizer, create_custom_scheduler
-
+from llamafactory.modules import weighted_ce_loss
 
 if TYPE_CHECKING:
     from torch.utils.data import Dataset
@@ -51,7 +51,6 @@ class CustomSeq2SeqTrainer(Seq2SeqTrainer):
         finetuning_args: "FinetuningArguments",
         processor: Optional["ProcessorMixin"],
         gen_kwargs: Optional[dict[str, Any]] = None,
-        compute_loss_func: Optional[Callable] = None,
         **kwargs,
     ) -> None:
         if is_transformers_version_greater_than("4.46"):
@@ -78,6 +77,11 @@ class CustomSeq2SeqTrainer(Seq2SeqTrainer):
 
             self.accelerator.clip_grad_norm_ = MethodType(clip_grad_norm_old_version, self.accelerator)
             self.add_callback(BAdamCallback)
+        if finetuning_args.enable_weighted_ce_loss:
+            ce_loss = weighted_ce_loss.WeightedCELoss(weighted_ce_loss.REASON_START_TOKEN_ID, weighted_ce_loss.REASON_END_TOKEN_ID,
+                                            weighted_ce_loss.REASON_WEIGHT, weighted_ce_loss.RESULT_WEIGHT,
+                                            weighted_ce_loss.IGNORE_INDEX)
+            self.compute_loss_func = ce_loss
 
     @override
     def create_optimizer(self) -> "torch.optim.Optimizer":

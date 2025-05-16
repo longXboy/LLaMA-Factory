@@ -447,6 +447,15 @@ class FinetuningArguments(
         default=False,
         metadata={"help": "Whether or not to compute effective tokens per second."},
     )
+    enable_weighted_ce_loss: bool = field(
+        default=False,
+        metadata={
+            "help": (
+                "Whether or not to use the weighted ce loss function. "
+                "If set to True, the custom loss function will be used instead of the default one."
+            )
+        },
+    )
 
     def __post_init__(self):
         def split_arg(arg):
