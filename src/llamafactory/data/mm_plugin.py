@@ -57,7 +57,10 @@ if is_transformers_version_greater_than("4.45.0"):
     )
 
 
-if is_transformers_version_greater_than("4.49.0"):
+if is_transformers_version_greater_than("4.52.0"):
+    from transformers.image_utils import make_flat_list_of_images
+    from transformers.video_utils import make_batched_videos
+elif is_transformers_version_greater_than("4.49.0"):
     from transformers.image_utils import make_batched_videos, make_flat_list_of_images
 
 
@@ -522,14 +525,14 @@ class InternVLPlugin(BasePlugin):
         mm_inputs = {}
         image_video_patches = []
 
-        if len(images) != 0 and isinstance(images[0], str):
+        if len(images) != 0:
             images = self._regularize_images(
                 images,
                 image_max_pixels=getattr(processor, "image_max_pixels", 1024 * 1024),
                 image_min_pixels=getattr(processor, "image_min_pixels", 32 * 32),
             )["images"]
 
-        if len(videos) != 0 and isinstance(videos[0], str):
+        if len(videos) != 0:
             videos = self._regularize_videos(
                 videos,
                 image_max_pixels=getattr(processor, "video_max_pixels", 256 * 256),
